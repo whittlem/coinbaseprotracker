@@ -1,2 +1,1 @@
-# coinbaseprotracker
-Coinbase Pro Portfolio Tracker
+# Coinbase Pro Portfolio Tracker
