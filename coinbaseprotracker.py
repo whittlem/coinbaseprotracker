@@ -1,4 +1,4 @@
-import json
+import json, sys
 from models.CoinbasePro import AuthAPI as CBAuthAPI, PublicAPI as CBPublicAPI
 
 try:
@@ -21,6 +21,10 @@ try:
             api = CBAuthAPI(api_key, api_secret, api_pass)
             orders = api.getOrders()
 
+            fees = api.authAPI('GET', 'fees')
+            maker_fee_rate = float(fees['maker_fee_rate'].to_string(index=False).strip())
+            taker_fee_rate = float(fees['maker_fee_rate'].to_string(index=False).strip())
+
             if len(orders) > 0:
                 last_order = orders.iloc[-1:]
                 last_buy_order = last_order[last_order.action == 'buy']
@@ -30,6 +34,7 @@ try:
                     print (last_buy_order.to_string(index=False))
 
                     market = last_buy_order['market'].to_string(index=False).strip()
+                    order_type = last_buy_order['type'].to_string(index=False).strip()
                     size = float(last_buy_order['size'].to_string(index=False).strip())
                     value = float(last_buy_order['value'].to_string(index=False).strip())
                     price = float(last_buy_order['price'].to_string(index=False).strip())
@@ -39,8 +44,12 @@ try:
                     current_value = ticker * size
 
                     gross_profit = current_value - value
-                    net_profit = current_value - value - 2.99
-                    margin = (current_value - value - 2.99) / current_value * 100
+
+                    maker_sale_fees = current_value * maker_fee_rate
+                    taker_sale_fees = current_value * taker_fee_rate
+
+                    maker_net_profit = current_value - value - maker_sale_fees
+                    maker_margin = (current_value - value - maker_fee_rate) / current_value * 100
 
                     if isinstance(ticker, float): 
                         print ("\n", "       Current Price :", "{:.2f}".format(ticker))
@@ -48,9 +57,16 @@ try:
                         print ("\n", "      Purchase Value :", "{:.2f}".format(value))
                         print (     "        Current Value :", "{:.2f}".format(current_value))
 
+                        print ("\n", "      Maker Sale Fee :", "{:.2f}".format(maker_sale_fees), '(', str(maker_fee_rate), ')')
+                        print (     "        Take Sale Fee :", "{:.2f}".format(taker_sale_fees), '(', str(taker_fee_rate), ')')
+
                         print ("\n", "        Gross Profit :", "{:.2f}".format(gross_profit))
-                        print (     "           Net Profit :", "{:.2f}".format(net_profit))
-                        print (     "               Margin :", str("{:.2f}".format(margin)) + '%')
+
+                        print ("\n", "    Maker Net Profit :", "{:.2f}".format(maker_net_profit))
+                        print (     "         Maker Margin :", str("{:.2f}".format(maker_margin)) + '%')
+
+                        print ("\n", "    Taker Net Profit :", "{:.2f}".format(maker_net_profit))
+                        print (     "         Taker Margin :", str("{:.2f}".format(maker_margin)) + '%')
 
                 else:
                     print ('*** no active position open ***')
