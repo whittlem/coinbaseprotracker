@@ -30,19 +30,25 @@ try:
                     print (last_buy_order.to_string(index=False))
 
                     market = last_buy_order['market'].to_string(index=False).strip()
+                    size = float(last_buy_order['size'].to_string(index=False).strip())
+                    value = float(last_buy_order['value'].to_string(index=False).strip())
                     price = float(last_buy_order['price'].to_string(index=False).strip())
                     
                     api = CBPublicAPI()
                     ticker = api.getTicker(market)
+                    current_value = ticker * size
 
-                    sale_fee = 2.99
-                    net_profit = ticker - price - sale_fee
-                    margin = (ticker - price) / price * 100
+                    gross_profit = current_value - value
+                    net_profit = current_value - value - 2.99
+                    margin = (current_value - value - 2.99) / current_value * 100
 
                     if isinstance(ticker, float): 
-                        print ("\n", "  Net Purchase Price :", "{:.2f}".format(price))
-                        print (     "  Gross Current Price :", "{:.2f}".format(ticker))
-                        print (     "             Sale Fee :", sale_fee)
+                        print ("\n", "       Current Price :", "{:.2f}".format(ticker))
+
+                        print ("\n", "      Purchase Value :", "{:.2f}".format(value))
+                        print (     "        Current Value :", "{:.2f}".format(current_value))
+
+                        print ("\n", "        Gross Profit :", "{:.2f}".format(gross_profit))
                         print (     "           Net Profit :", "{:.2f}".format(net_profit))
                         print (     "               Margin :", str("{:.2f}".format(margin)) + '%')
 
