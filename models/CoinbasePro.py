@@ -146,7 +146,7 @@ class AuthAPI():
             return pd.DataFrame()
 
         # calculates the price at the time of purchase
-        df['price'] = df.apply(lambda row: (float(row.executed_value) * 100) / (float(row.filled_size) * 100), axis=1)
+        df['price'] = df.apply(lambda row: (float(row.executed_value) * 100) / (float(row.filled_size) * 100) if float(row.filled_size) > 0 else 0, axis=1)
 
         # rename the columns
         df.columns = [ 'created_at', 'market', 'action', 'type', 'size', 'value', 'status', 'price' ]
