@@ -12,7 +12,7 @@ try:
         portfolio_config = config[portfolio]
 
         if 'api_key' in portfolio_config and 'api_secret' in portfolio_config and 'api_pass' in portfolio_config:
-            print ('=== ', portfolio, " =====================================================================\n")
+            print ('=== ', portfolio, " =======================================================\n")
 
             api_key = portfolio_config['api_key']
             api_secret = portfolio_config['api_secret']
