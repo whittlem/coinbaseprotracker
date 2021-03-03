@@ -51,6 +51,9 @@ try:
                     maker_net_profit = current_value - value - maker_sale_fees
                     maker_margin = (current_value - value - maker_fee_rate) / current_value * 100
 
+                    taker_net_profit = current_value - value - taker_sale_fees
+                    taker_margin = (current_value - value - taker_fee_rate) / current_value * 100
+
                     if isinstance(ticker, float): 
                         print ("\n", "       Current Price :", "{:.2f}".format(ticker))
 
@@ -58,18 +61,82 @@ try:
                         print (     "        Current Value :", "{:.2f}".format(current_value))
 
                         print ("\n", "      Maker Sale Fee :", "{:.2f}".format(maker_sale_fees), '(', str(maker_fee_rate), ')')
-                        print (     "        Take Sale Fee :", "{:.2f}".format(taker_sale_fees), '(', str(taker_fee_rate), ')')
+                        print (     "       Taker Sale Fee :", "{:.2f}".format(taker_sale_fees), '(', str(taker_fee_rate), ')')
 
                         print ("\n", "        Gross Profit :", "{:.2f}".format(gross_profit))
 
                         print ("\n", "    Maker Net Profit :", "{:.2f}".format(maker_net_profit))
                         print (     "         Maker Margin :", str("{:.2f}".format(maker_margin)) + '%')
 
-                        print ("\n", "    Taker Net Profit :", "{:.2f}".format(maker_net_profit))
-                        print (     "         Taker Margin :", str("{:.2f}".format(maker_margin)) + '%')
+                        print ("\n", "    Taker Net Profit :", "{:.2f}".format(taker_net_profit))
+                        print (     "         Taker Margin :", str("{:.2f}".format(taker_margin)) + '%')
 
                 else:
-                    print ('*** no active position open ***')
+                    if len(orders) > 0:
+                        second_last_order = orders.iloc[-2:]
+                        last_buy_order = second_last_order[second_last_order.action == 'buy']
+                        last_buy_order = last_buy_order.reset_index(drop=True)
+
+                        if len(last_buy_order) > 0:
+                            orders = api.getOrders(status='open')
+                            if len(orders) == 1:
+                                last_open_order = orders[orders.action == 'sell']
+                                last_open_order = last_open_order.reset_index(drop=True)
+
+                                print (last_buy_order.to_string(index=False))
+                                print ("\n", last_open_order.to_string(index=False))
+                                
+                                market = last_buy_order['market'].to_string(index=False).strip()
+                                order_type = last_buy_order['type'].to_string(index=False).strip()
+                                size = float(last_buy_order['size'].to_string(index=False).strip())
+                                value = float(last_buy_order['value'].to_string(index=False).strip())
+                                price = float(last_buy_order['price'].to_string(index=False).strip())
+
+                                future_value = float(last_open_order['value'].to_string(index=False).strip())
+
+                                api = CBPublicAPI()
+                                ticker = api.getTicker(market)
+                                current_value = ticker * size
+
+                                gross_profit = current_value - value
+
+                                maker_sale_fees = future_value * maker_fee_rate
+                                taker_sale_fees = current_value * taker_fee_rate
+
+                                maker_net_profit = future_value - value - maker_sale_fees
+                                maker_margin = (future_value - value - maker_fee_rate) / future_value * 100
+
+                                taker_net_profit = current_value - value - taker_sale_fees
+                                taker_margin = (current_value - value - taker_fee_rate) / current_value * 100
+
+                                future_gross_profit = future_value - value
+
+                                if isinstance(ticker, float): 
+                                    print ("\n", "       Current Price :", "{:.2f}".format(ticker))
+
+                                    print ("\n", "      Purchase Value :", "{:.2f}".format(value))
+                                    print (     "        Current Value :", "{:.2f}".format(current_value))
+                                    print (     "         Target Value :", "{:.2f}".format(future_value))
+
+                                    print ("\n", "      Maker Sale Fee :", "{:.2f}".format(maker_sale_fees), '(', str(maker_fee_rate), ')')
+                                    print (     "       Taker Sale Fee :", "{:.2f}".format(taker_sale_fees), '(', str(taker_fee_rate), ')')
+
+                                    print ("\n", "        Gross Profit :", "{:.2f}".format(gross_profit), '(now)')
+                                    print (     "     Taker Net Profit :", "{:.2f}".format(taker_net_profit), '(now)')
+                                    print (     "         Taker Margin :", str("{:.2f}".format(taker_margin)) + '%', '(now)')
+
+                                    print ("\n", "        Gross Profit :", "{:.2f}".format(future_gross_profit), '(target)')
+                                    print (     "     Maker Net Profit :", "{:.2f}".format(maker_net_profit), '(target)')
+                                    print (     "         Maker Margin :", str("{:.2f}".format(maker_margin)) + '%', '(target)')
+
+                            else:
+                                print ('*** no active position open ***')
+
+                        else:
+                            print ('*** no active position open ***')
+
+                    else:
+                        print ('*** no active position open ***')
             
             print ("\n")
 
