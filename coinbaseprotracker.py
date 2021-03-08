@@ -1,15 +1,56 @@
 import json, sys
 from models.CoinbasePro import AuthAPI as CBAuthAPI, PublicAPI as CBPublicAPI
 
+def printHelp():
+    print ('Create a config.json:')
+    print ('* Add 1 or more portfolios', "\n")
+
+    print ('{')
+    print ('    "<portfolio_name>" : {')
+    print ('        "api_key" : "<coinbase_pro_api_key>",')
+    print ('        "api_secret" : "<coinbase_pro_api_secret>",')
+    print ('        "api_pass" : "<coinbase_pro_api_passphrase>",')
+    print ('        "config" : {')
+    print ('            "base_currency" : "<base_symbol>",')
+    print ('            "quote_currency" : "<quote_symbol>"')
+    print ('        "}')
+    print ('    },')
+    print ('    "<portfolio_name>" : {')
+    print ('        "api_key" : "<coinbase_pro_api_key>",')
+    print ('        "api_secret" : "<coinbase_pro_api_secret>",')
+    print ('        "api_pass" : "<coinbase_pro_api_passphrase>",')
+    print ('        "config" : {')
+    print ('            "base_currency" : "<base_symbol>",')
+    print ('            "quote_currency" : "<quote_symbol>"')
+    print ('        "}')
+    print ('    }')
+    print ('}', "\n")
+
+    print ('<portfolio_name> - Coinbase Pro portfolio name E.g. "Default portfolio"')
+    print ('<coinbase_pro_api_key> - Coinbase Pro API key for the portfolio')
+    print ('<coinbase_pro_api_secret> - Coinbase Pro API secret for the portfolio')
+    print ('<coinbase_pro_api_passphrase> - Coinbase Pro API passphrase for the portfolio')
+    print ('<base_symbol> - Base currency E.g. BTC')
+    print ('<quote_symbol> - Base currency E.g. GBP')
+    print ("\n")
+
 try:
     with open('config.json') as config_file:
-        config = json.load(config_file)
+        json_config = json.load(config_file)
 
-    if not isinstance(config, dict):
+    if not isinstance(json_config, dict):
         raise TypeError('config.json is invalid.')
 
-    for portfolio in list(config):
-        portfolio_config = config[portfolio]
+    if len(list(json_config)) < 1:
+        printHelp()
+        sys.exit()
+
+    for portfolio in list(json_config):
+        base_currency = ''
+        quote_currency = ''
+        market = ''
+
+        portfolio_config = json_config[portfolio]
 
         if 'api_key' in portfolio_config and 'api_secret' in portfolio_config and 'api_pass' in portfolio_config and 'config' in portfolio_config:
             print ('=== ', portfolio, " =======================================================\n")
@@ -18,11 +59,10 @@ try:
             api_secret = portfolio_config['api_secret']
             api_pass = portfolio_config['api_pass']
 
-
             config = portfolio_config['config']
             if ('cryptoMarket' not in config and 'base_currency' not in config) and ('fiatMarket' not in config and 'quote_currency' not in config):
-                print ('warning: skipped as cryptoMarket/base_currency and fiatMarket/quote_currency not present under "config" in config.json!', "\n")
-                break
+                printHelp()
+                sys.exit()
 
             if 'cryptoMarket' in config:
                 base_currency = config['cryptoMarket']
@@ -157,6 +197,9 @@ try:
                         print ('*** no active position open ***')
             
             print ("\n")
+        else:
+            printHelp()
+            sys.exit()
 
         #break
 
