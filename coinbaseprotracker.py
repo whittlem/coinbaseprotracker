@@ -11,15 +11,33 @@ try:
     for portfolio in list(config):
         portfolio_config = config[portfolio]
 
-        if 'api_key' in portfolio_config and 'api_secret' in portfolio_config and 'api_pass' in portfolio_config:
+        if 'api_key' in portfolio_config and 'api_secret' in portfolio_config and 'api_pass' in portfolio_config and 'config' in portfolio_config:
             print ('=== ', portfolio, " =======================================================\n")
 
             api_key = portfolio_config['api_key']
             api_secret = portfolio_config['api_secret']
             api_pass = portfolio_config['api_pass']
 
+
+            config = portfolio_config['config']
+            if ('cryptoMarket' not in config and 'base_currency' not in config) and ('fiatMarket' not in config and 'quote_currency' not in config):
+                print ('warning: skipped as cryptoMarket/base_currency and fiatMarket/quote_currency not present under "config" in config.json!', "\n")
+                break
+
+            if 'cryptoMarket' in config:
+                base_currency = config['cryptoMarket']
+            elif 'base_currency' in config:
+                base_currency = config['base_currency']
+
+            if 'fiatMarket' in config:
+                quote_currency = config['fiatMarket']
+            elif 'base_currency' in config:
+                quote_currency = config['quote_currency']
+
+            market = base_currency + '-' + quote_currency
+
             api = CBAuthAPI(api_key, api_secret, api_pass)
-            orders = api.getOrders()
+            orders = api.getOrders(market)
 
             fees = api.authAPI('GET', 'fees')
             maker_fee_rate = float(fees['maker_fee_rate'].to_string(index=False).strip())
