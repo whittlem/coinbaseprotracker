@@ -130,3 +130,5 @@ dmypy.json
 
 config.json
 .vscode
+
+tracker.csv

@@ -25,6 +25,7 @@ https://whittle.medium.com
 
     git clone https://github.com/whittlem/coinbaseprotracker
     cd coinbaseprotracker
+    python3 -m pip install -r requirements.txt
 
 ## Configuration
 
