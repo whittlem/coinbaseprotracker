@@ -35,27 +35,47 @@ Create a config.json file with your read-only Coinbase Pro portfolio API keys:
         "Bot - XLM-EUR" : {
             "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
             "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE"
+            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
+            "config" : {
+                "base_currency" : "XLM",
+                "quote_currency" : "EUR"
+            }
         },
         "Bot - ETH-GBP" : {
             "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
             "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE"
+            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
+            "config" : {
+                "base_currency" : "ETH",
+                "quote_currency" : "GBP"
+            }
         },
         "Bot - BTC-GBP" : {
             "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
             "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE"
+            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
+             "config" : {
+                "base_currency" : "BTC",
+                "quote_currency" : "GBP"
+            }
         },
         "Bot - BCH-GBP" : {
             "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
             "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE"
+            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
+             "config" : {
+                "base_currency" : "BCH",
+                "quote_currency" : "GBP"
+            }
         },
         "Bot - LTC-GBP" : {
             "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
             "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE"
+            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
+             "config" : {
+                "base_currency" : "LTC",
+                "quote_currency" : "GBP"
+            }
         }        
     }
 
