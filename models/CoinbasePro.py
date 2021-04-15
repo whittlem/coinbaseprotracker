@@ -1,5 +1,6 @@
 """Remotely control your Coinbase Pro account via their API"""
 
+import numpy as np
 import pandas as pd
 import re, json, hmac, hashlib, time, requests, base64, sys
 from datetime import datetime, timedelta
@@ -145,7 +146,7 @@ class AuthAPI():
                 df = resp.copy()[[ 'created_at', 'product_id', 'side', 'type', 'size', 'price', 'status' ]]
                 df['value'] = float(df['price']) * float(df['size'])
             else:
-                df = resp.copy()[[ 'created_at', 'product_id', 'side', 'type', 'filled_size', 'executed_value', 'status' ]]
+                df = resp.copy()[[ 'created_at', 'product_id', 'side', 'type', 'filled_size', 'executed_value', 'fill_fees', 'status' ]]
         else:
             return pd.DataFrame()
 
@@ -158,8 +159,14 @@ class AuthAPI():
             df.columns = [ 'created_at', 'market', 'action', 'type', 'size', 'price', 'status', 'value' ]
             df = df[[ 'created_at', 'market', 'action', 'type', 'size', 'value', 'status', 'price' ]]
         else:
-            df.columns = [ 'created_at', 'market', 'action', 'type', 'size', 'value', 'status', 'price' ]
-        
+            df.columns = [ 'created_at', 'market', 'action', 'type', 'size', 'value', 'fees', 'status', 'price' ]
+            df = df[[ 'created_at', 'market', 'action', 'type', 'size', 'value', 'fees', 'price', 'status' ]]
+            df['fees'] = df['fees'].astype(float).round(2)
+
+        df['size'] = df['size'].astype(float)
+        df['value'] = df['value'].astype(float)
+        df['price'] = df['price'].astype(float)
+
         # convert dataframe to a time series
         tsidx = pd.DatetimeIndex(pd.to_datetime(df['created_at']).dt.strftime('%Y-%m-%dT%H:%M:%S.%Z'))
         df.set_index(tsidx, inplace=True)

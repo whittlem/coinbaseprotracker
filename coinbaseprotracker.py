@@ -110,16 +110,18 @@ try:
                             df_buy['created_at'], 
                             df_buy['type'], 
                             df_buy['size'],
-                            df_buy['value'], 
+                            df_buy['value'],
+                            df_buy['fees'], 
                             df_buy['price'],
                             df_sell['created_at'],
                             df_sell['type'], 
                             df_sell['size'], 
-                            df_sell['value'], 
+                            df_sell['value'],
+                            df_sell['fees'], 
                             df_sell['price']                    
                         ]], columns=[ 'status', 'market', 
-                            'buy_at', 'buy_type', 'buy_size', 'buy_value', 'buy_price',
-                            'sell_at', 'sell_type', 'sell_size', 'sell_value', 'sell_price' 
+                            'buy_at', 'buy_type', 'buy_size', 'buy_value', 'buy_fees', 'buy_price',
+                            'sell_at', 'sell_type', 'sell_size', 'sell_value', 'sell_fees', 'sell_price' 
                         ])
                     
                     df_tracker = df_tracker.append(df_pair, ignore_index=True)
@@ -242,7 +244,7 @@ try:
         #break
 
     df_tracker = df_tracker[df_tracker['status'] == 'done']
-    df_tracker['profit'] = np.subtract(df_tracker['sell_value'], df_tracker['buy_value'])
+    df_tracker['profit'] = np.subtract(np.subtract(df_tracker['sell_value'], df_tracker['buy_value']), np.add(df_tracker['sell_fees'], df_tracker['buy_fees']))
     df_tracker['margin'] = np.multiply(np.true_divide(df_tracker['profit'], df_tracker['sell_value']), 100)
     df_sincebot = df_tracker[df_tracker['buy_at'] > '2021-03-1']
     save_file = 'tracker.csv'
