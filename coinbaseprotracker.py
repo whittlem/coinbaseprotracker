@@ -245,7 +245,7 @@ try:
 
     df_tracker = df_tracker[df_tracker['status'] == 'done']
     df_tracker['profit'] = np.subtract(np.subtract(df_tracker['sell_value'], df_tracker['buy_value']), np.add(df_tracker['sell_fees'], df_tracker['buy_fees']))
-    df_tracker['margin'] = np.multiply(np.true_divide(df_tracker['profit'], df_tracker['sell_value']), 100)
+    df_tracker['margin'] = np.multiply(np.true_divide(df_tracker['profit'], df_tracker['buy_value']), 100)
     df_sincebot = df_tracker[df_tracker['buy_at'] > '2021-03-1']
     save_file = 'tracker.csv'
 
