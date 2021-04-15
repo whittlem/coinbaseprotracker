@@ -149,8 +149,6 @@ try:
                     ticker = api.getTicker(market)
                     current_value = ticker * size
 
-                    gross_profit = current_value - value
-
                     maker_sale_fees = current_value * maker_fee_rate
                     taker_sale_fees = current_value * taker_fee_rate
 
@@ -169,12 +167,10 @@ try:
                         print ("\n", "      Maker Sale Fee :", "{:.2f}".format(maker_sale_fees), '(', str(maker_fee_rate), ')')
                         print (     "       Taker Sale Fee :", "{:.2f}".format(taker_sale_fees), '(', str(taker_fee_rate), ')')
 
-                        print ("\n", "        Gross Profit :", "{:.2f}".format(gross_profit))
-
-                        print ("\n", "    Maker Net Profit :", "{:.2f}".format(maker_net_profit))
+                        print ("\n", "        Maker Profit :", "{:.2f}".format(maker_net_profit))
                         print (     "         Maker Margin :", str("{:.2f}".format(maker_margin)) + '%')
 
-                        print ("\n", "    Taker Net Profit :", "{:.2f}".format(taker_net_profit))
+                        print ("\n", "        Taker Profit :", "{:.2f}".format(taker_net_profit))
                         print (     "         Taker Margin :", str("{:.2f}".format(taker_margin)) + '%')
 
                 else:
@@ -204,8 +200,6 @@ try:
                                 ticker = api.getTicker(market)
                                 current_value = ticker * size
 
-                                gross_profit = current_value - value
-
                                 maker_sale_fees = future_value * maker_fee_rate
                                 taker_sale_fees = current_value * taker_fee_rate
 
@@ -214,8 +208,6 @@ try:
 
                                 taker_net_profit = current_value - value - taker_sale_fees
                                 taker_margin = (current_value - value - taker_fee_rate) / current_value * 100
-
-                                future_gross_profit = future_value - value
 
                                 if isinstance(ticker, float): 
                                     print ("\n", "       Current Price :", "{:.2f}".format(ticker))
@@ -227,12 +219,10 @@ try:
                                     print ("\n", "      Maker Sale Fee :", "{:.2f}".format(maker_sale_fees), '(', str(maker_fee_rate), ')')
                                     print (     "       Taker Sale Fee :", "{:.2f}".format(taker_sale_fees), '(', str(taker_fee_rate), ')')
 
-                                    print ("\n", "        Gross Profit :", "{:.2f}".format(gross_profit), '(now)')
-                                    print (     "     Taker Net Profit :", "{:.2f}".format(taker_net_profit), '(now)')
+                                    print (     "         Taker Profit :", "{:.2f}".format(taker_net_profit), '(now)')
                                     print (     "         Taker Margin :", str("{:.2f}".format(taker_margin)) + '%', '(now)')
 
-                                    print ("\n", "        Gross Profit :", "{:.2f}".format(future_gross_profit), '(target)')
-                                    print (     "     Maker Net Profit :", "{:.2f}".format(maker_net_profit), '(target)')
+                                    print (     "         Maker Profit :", "{:.2f}".format(maker_net_profit), '(target)')
                                     print (     "         Maker Margin :", str("{:.2f}".format(maker_margin)) + '%', '(target)')
 
                             else:
@@ -254,7 +244,7 @@ try:
     df_tracker = df_tracker[df_tracker['status'] == 'done']
     df_tracker['profit'] = np.subtract(df_tracker['sell_value'], df_tracker['buy_value'])
     df_tracker['margin'] = np.multiply(np.true_divide(df_tracker['profit'], df_tracker['sell_value']), 100)
-    df_sincebot = df_tracker[df_tracker['buy_at'] > '2021-02-1']
+    df_sincebot = df_tracker[df_tracker['buy_at'] > '2021-03-1']
     save_file = 'tracker.csv'
 
     try:
