@@ -155,10 +155,10 @@ try:
                     taker_sale_fees = current_value * taker_fee_rate
 
                     maker_net_profit = current_value - value - maker_sale_fees
-                    maker_margin = (current_value - value - maker_fee_rate) / current_value * 100
+                    maker_margin = (current_value - value - maker_sale_fees) / current_value * 100
 
                     taker_net_profit = current_value - value - taker_sale_fees
-                    taker_margin = (current_value - value - taker_fee_rate) / current_value * 100
+                    taker_margin = (current_value - value - taker_sale_fees) / current_value * 100
 
                     if isinstance(ticker, float): 
                         print ("\n", "       Current Price :", "{:.2f}".format(ticker))
