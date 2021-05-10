@@ -131,7 +131,7 @@ try:
 
             fees = api.authAPI('GET', 'fees')
             maker_fee_rate = float(fees['maker_fee_rate'].to_string(index=False).strip())
-            taker_fee_rate = float(fees['maker_fee_rate'].to_string(index=False).strip())
+            taker_fee_rate = float(fees['taker_fee_rate'].to_string(index=False).strip())
 
             if len(orders) > 0:
                 last_order = orders.iloc[-1:]
