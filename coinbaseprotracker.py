@@ -84,8 +84,11 @@ try:
             orders = api.getOrders(market)
 
             last_action = ''
-            for market in orders['market'].sort_values().unique():
-                df_market = orders[orders['market'] == market]
+            if len(orders) > 0:
+                for market in orders['market'].sort_values().unique():
+                    df_market = orders[orders['market'] == market]
+            else:
+                df_market = pd.DataFrame()
 
             df_buy = pd.DataFrame()
             df_sell = pd.DataFrame()
