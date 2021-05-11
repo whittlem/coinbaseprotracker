@@ -163,10 +163,10 @@ try:
                     taker_sale_fees = current_value * taker_fee_rate
 
                     maker_net_profit = round(current_value - buy_filled - maker_sale_fees, 2)
-                    maker_margin = ( maker_net_profit/ value) * 100
+                    maker_margin = ( maker_net_profit/ buy_filled) * 100
 
                     taker_net_profit = round(current_value - buy_filled - taker_sale_fees, 2)
-                    taker_margin = (taker_net_profit / value) * 100
+                    taker_margin = (taker_net_profit / buy_filled) * 100
 
                     if isinstance(ticker, float): 
                         print ("\n", "       Current Price :", "{:.2f}".format(ticker))
@@ -218,10 +218,10 @@ try:
 
                                 maker_net_profit = round(future_value - buy_filled - maker_sale_fees, 2)
 
-                                maker_margin = (maker_net_profit / value) * 100
+                                maker_margin = (maker_net_profit / buy_filled) * 100
 
                                 taker_net_profit = round(current_value - buy_filled - taker_sale_fees, 2)
-                                taker_margin = (taker_net_profit / value) * 100
+                                taker_margin = (taker_net_profit / buy_filled) * 100
 
                                 if isinstance(ticker, float): 
                                     print ("\n", "       Current Price :", "{:.2f}".format(ticker))
