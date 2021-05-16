@@ -146,7 +146,13 @@ class AuthAPI():
                 df = resp.copy()[[ 'created_at', 'product_id', 'side', 'type', 'size', 'price', 'status' ]]
                 df['value'] = float(df['price']) * float(df['size'])
             else:
-                df = resp.copy()[[ 'created_at', 'product_id', 'side', 'type', 'filled_size', 'executed_value', 'fill_fees', 'status' ]]
+                if 'specified_funds' in resp:
+                    df = resp.copy()[[ 'created_at', 'product_id', 'side', 'type', 'filled_size', 'specified_funds', 'executed_value', 'fill_fees', 'status' ]]
+                else:
+                    # manual limit orders do not contain 'specified_funds'
+                    df_tmp = resp.copy()
+                    df_tmp['specified_funds'] = None
+                    df = df_tmp[[ 'created_at', 'product_id', 'side', 'type', 'filled_size', 'specified_funds', 'executed_value', 'fill_fees', 'status' ]]
         else:
             return pd.DataFrame()
 
@@ -158,9 +164,12 @@ class AuthAPI():
         if status == 'open':
             df.columns = [ 'created_at', 'market', 'action', 'type', 'size', 'price', 'status', 'value' ]
             df = df[[ 'created_at', 'market', 'action', 'type', 'size', 'value', 'status', 'price' ]]
+            df['size'] = df['size'].astype(float).round(8)
         else:
-            df.columns = [ 'created_at', 'market', 'action', 'type', 'size', 'value', 'fees', 'status', 'price' ]
-            df = df[[ 'created_at', 'market', 'action', 'type', 'size', 'value', 'fees', 'price', 'status' ]]
+            df.columns = [ 'created_at', 'market', 'action', 'type', 'value', 'size', 'filled', 'fees', 'status', 'price' ]
+            df = df[[ 'created_at', 'market', 'action', 'type', 'value', 'size', 'fees', 'price', 'status' ]]
+            df.columns = [ 'created_at', 'market', 'action', 'type', 'size', 'value', 'fees', 'price', 'status' ]
+            
             df['fees'] = df['fees'].astype(float).round(2)
 
         df['size'] = df['size'].astype(float)

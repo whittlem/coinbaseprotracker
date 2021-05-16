@@ -148,16 +148,16 @@ try:
 
                     market = last_buy_order['market'].to_string(index=False).strip()
                     order_type = last_buy_order['type'].to_string(index=False).strip()
-                    size = round(float(last_buy_order['size'].to_string(index=False).strip()), 6)
-                    value = round(float(last_buy_order['value'].to_string(index=False).strip()), 2)
-                    price = round(float(last_buy_order['price'].to_string(index=False).strip()), 2)
-                    buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 2)
+                    size = round(float(last_buy_order['size'].to_string(index=False).strip()), 8)
+                    value = round(float(last_buy_order['value'].to_string(index=False).strip()), 8)
+                    price = round(float(last_buy_order['price'].to_string(index=False).strip()), 8)
+                    buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 8)
                     
-                    buy_filled = round(value + buy_fees, 2)
+                    buy_filled = round(value, 8)
 
                     api = CBPublicAPI()
                     ticker = api.getTicker(market)
-                    current_value = round(ticker * size, 2)
+                    current_value = round(ticker * size, 8)
 
                     maker_sale_fees = current_value * maker_fee_rate
                     taker_sale_fees = current_value * taker_fee_rate
@@ -169,7 +169,7 @@ try:
                     taker_margin = (taker_net_profit / buy_filled) * 100
 
                     if isinstance(ticker, float): 
-                        print ("\n", "       Current Price :", "{:.2f}".format(ticker))
+                        print ("\n", "       Current Price :", ticker)
 
                         print ("\n", "      Purchase Value :", "{:.2f}".format(value))
                         print (     "        Current Value :", "{:.2f}".format(current_value))
