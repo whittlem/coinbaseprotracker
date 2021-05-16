@@ -100,7 +100,10 @@ try:
                     pair = 1
 
                 if pair == 1 and (row['action'] != last_action):
-                    if row['action'] == 'buy':
+                    if row['action'] == 'buy':                        
+                        if row['type'] == 'limit':
+                            row['value'] = (row['price'] * row['size']) - row['fees']
+                        
                         df_buy = row
                     elif row['action'] == 'sell':
                         df_sell = row
@@ -120,9 +123,9 @@ try:
                             df_sell['created_at'],
                             df_sell['type'], 
                             round(df_sell['size'], 5),
-                            round(df_sell['value'], 2),
+                            round(df_sell['price'] * df_sell['size'], 2),
                             round(df_sell['fees'], 2), 
-                            round(df_sell['value'] - df_buy['fees'], 2),
+                            round((df_sell['price'] * df_sell['size']) - df_buy['fees'], 2),
                             round(df_sell['price'], 2)                    
                         ]], columns=[ 'status', 'market', 
                             'buy_at', 'buy_type', 'buy_size', 'buy_value', 'buy_fees', 'buy_with_fees','buy_price',
@@ -148,16 +151,16 @@ try:
 
                     market = last_buy_order['market'].to_string(index=False).strip()
                     order_type = last_buy_order['type'].to_string(index=False).strip()
-                    size = round(float(last_buy_order['size'].to_string(index=False).strip()), 6)
-                    value = round(float(last_buy_order['value'].to_string(index=False).strip()), 2)
-                    price = round(float(last_buy_order['price'].to_string(index=False).strip()), 2)
-                    buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 2)
+                    size = round(float(last_buy_order['size'].to_string(index=False).strip()), 8)
+                    value = round(float(last_buy_order['value'].to_string(index=False).strip()), 8)
+                    price = round(float(last_buy_order['price'].to_string(index=False).strip()), 8)
+                    buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 8)
                     
-                    buy_filled = round(value + buy_fees, 2)
+                    buy_filled = round(value, 8)
 
                     api = CBPublicAPI()
                     ticker = api.getTicker(market)
-                    current_value = round(ticker * size, 2)
+                    current_value = round(ticker * size, 8)
 
                     maker_sale_fees = current_value * maker_fee_rate
                     taker_sale_fees = current_value * taker_fee_rate
@@ -169,7 +172,7 @@ try:
                     taker_margin = (taker_net_profit / buy_filled) * 100
 
                     if isinstance(ticker, float): 
-                        print ("\n", "       Current Price :", "{:.2f}".format(ticker))
+                        print ("\n", "       Current Price :", ticker)
 
                         print ("\n", "      Purchase Value :", "{:.2f}".format(value))
                         print (     "        Current Value :", "{:.2f}".format(current_value))
