@@ -100,7 +100,10 @@ try:
                     pair = 1
 
                 if pair == 1 and (row['action'] != last_action):
-                    if row['action'] == 'buy':
+                    if row['action'] == 'buy':                        
+                        if row['type'] == 'limit':
+                            row['value'] = (row['price'] * row['size']) - row['fees']
+                        
                         df_buy = row
                     elif row['action'] == 'sell':
                         df_sell = row
@@ -120,9 +123,9 @@ try:
                             df_sell['created_at'],
                             df_sell['type'], 
                             round(df_sell['size'], 5),
-                            round(df_sell['value'], 2),
+                            round(df_sell['price'] * df_sell['size'], 2),
                             round(df_sell['fees'], 2), 
-                            round(df_sell['value'] - df_buy['fees'], 2),
+                            round((df_sell['price'] * df_sell['size']) - df_buy['fees'], 2),
                             round(df_sell['price'], 2)                    
                         ]], columns=[ 'status', 'market', 
                             'buy_at', 'buy_type', 'buy_size', 'buy_value', 'buy_fees', 'buy_with_fees','buy_price',
