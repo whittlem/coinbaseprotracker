@@ -125,7 +125,7 @@ class AuthAPI():
         # if market provided
         if market != '':
             # validates the market is syntactically correct
-            p = re.compile(r"^[A-Z]{3,4}\-[A-Z]{3,4}$")
+            p = re.compile(r"^[A-Z]{3,5}\-[A-Z]{3,4}$")
             if not p.match(market):
                 raise ValueError('Coinbase Pro market is invalid.')
 
