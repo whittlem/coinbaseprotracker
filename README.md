@@ -82,3 +82,13 @@ Create a config.json file with your read-only Coinbase Pro portfolio API keys:
 ## Run it
 
 % python3 coinbaseprotracker.py
+
+## Docker
+
+### Build
+
+`docker build -t coinbase-pro-tracker .`
+
+### Run
+
+`docker run --name tracker --rm coinbase-pro-tracker`
