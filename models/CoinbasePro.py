@@ -125,7 +125,7 @@ class AuthAPI():
         # if market provided
         if market != '':
             # validates the market is syntactically correct
-            p = re.compile(r"^[A-Z]{3,4}\-[A-Z]{3,4}$")
+            p = re.compile(r"^[1-9A-Z]{2,5}\-[1-9A-Z]{2,5}$")
             if not p.match(market):
                 raise ValueError('Coinbase Pro market is invalid.')
 
@@ -234,7 +234,7 @@ class AuthAPI():
         """Executes a market buy providing a funding amount"""
 
         # validates the market is syntactically correct
-        p = re.compile(r"^[A-Z]{3,4}\-[A-Z]{3,4}$")
+        p = re.compile(r"^[A-Z]{3,5}\-[A-Z]{3,4}$")
         if not p.match(market):
             raise ValueError('Coinbase Pro market is invalid.')
 
@@ -263,7 +263,7 @@ class AuthAPI():
         return model.authAPI('POST', 'orders', order)
 
     def marketSell(self, market='', cryptoAmount=0):
-        p = re.compile(r"^[A-Z]{3,4}\-[A-Z]{3,4}$")
+        p = re.compile(r"^[1-9A-Z]{2,5}\-[1-9A-Z]{2,5}$")
         if not p.match(market):
             raise ValueError('Coinbase Pro market is invalid.')
 
@@ -283,7 +283,7 @@ class AuthAPI():
         return model.authAPI('POST', 'orders', order)
 
     def limitSell(self, market='', cryptoAmount=0, futurePrice=0):
-        p = re.compile(r"^[A-Z]{3,4}\-[A-Z]{3,4}$")
+        p = re.compile(r"^[1-9A-Z]{2,5}\-[1-9A-Z]{2,5}$")
         if not p.match(market):
             raise ValueError('Coinbase Pro market is invalid.')
 
@@ -307,7 +307,7 @@ class AuthAPI():
         return model.authAPI('POST', 'orders', order)
 
     def cancelOrders(self, market=''):
-        p = re.compile(r"^[A-Z]{3,4}\-[A-Z]{3,4}$")
+        p = re.compile(r"^[1-9A-Z]{2,5}\-[1-9A-Z]{2,5}$")
         if not p.match(market):
             raise ValueError('Coinbase Pro market is invalid.')
 
@@ -401,7 +401,7 @@ class PublicAPI():
 
     def getHistoricalData(self, market='BTC-GBP', granularity=86400, iso8601start='', iso8601end=''):
         # validates the market is syntactically correct
-        p = re.compile(r"^[A-Z]{3,4}\-[A-Z]{3,4}$")
+        p = re.compile(r"^[1-9A-Z]{2,5}\-[1-9A-Z]{2,5}$")
         if not p.match(market):
             raise TypeError('Coinbase Pro market required.')
 
@@ -484,7 +484,7 @@ class PublicAPI():
 
     def getTicker(self, market='BTC-GBP'):
        # validates the market is syntactically correct
-        p = re.compile(r"^[A-Z]{3,4}\-[A-Z]{3,4}$")
+        p = re.compile(r"^[1-9A-Z]{2,5}\-[1-9A-Z]{2,5}$")
         if not p.match(market):
             raise TypeError('Coinbase Pro market required.')
 
