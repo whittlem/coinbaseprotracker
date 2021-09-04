@@ -104,9 +104,6 @@ try:
 
                 if pair == 1 and (row['action'] != last_action):
                     if row['action'] == 'buy':
-                        if row['type'] == 'limit':
-                            row['value'] = (row['price'] * row['size']) - row['fees']
-
                         df_buy = row
                     elif row['action'] == 'sell':
                         df_sell = row
@@ -118,21 +115,20 @@ try:
                             df_buy['market'],
                             df_buy['created_at'],
                             df_buy['type'],
-                            round(df_buy['size'], 5),
-                            round(df_buy['value'], 2),
-                            round(df_buy['fees'], 2),
-                            round(df_buy['value'] + df_buy['fees'], 2),
-                            round(df_buy['price'], 2),
+                            df_buy['size'],
+                            df_buy['filled'],
+                            df_buy['fees'],
+                            df_buy['price'],
+
                             df_sell['created_at'],
                             df_sell['type'],
-                            round(df_sell['size'], 5),
-                            round(df_sell['price'] * df_sell['size'], 2),
-                            round(df_sell['fees'], 2),
-                            round((df_sell['price'] * df_sell['size']) - df_buy['fees'], 2),
-                            round(df_sell['price'], 2)
+                            df_sell['size'],
+                            df_sell['filled'],
+                            df_sell['fees'],
+                            df_sell['price'],
                         ]], columns=[ 'status', 'market',
-                            'buy_at', 'buy_type', 'buy_size', 'buy_value', 'buy_fees', 'buy_with_fees','buy_price',
-                            'sell_at', 'sell_type', 'sell_size', 'sell_value', 'sell_fees', 'sell_minus_fees', 'sell_price'
+                            'buy_at', 'buy_type', 'buy_size', 'buy_filled', 'buy_fees', 'buy_price',
+                            'sell_at', 'sell_type', 'sell_size', 'sell_filled', 'sell_fees', 'sell_price'
                         ])
 
                     df_tracker = df_tracker.append(df_pair, ignore_index=True)
@@ -152,36 +148,39 @@ try:
                 if len(last_buy_order) > 0:
                     print (last_buy_order.to_string(index=False))
 
-                    market = last_buy_order['market'].to_string(index=False).strip()
-                    order_type = last_buy_order['type'].to_string(index=False).strip()
-                    size = round(float(last_buy_order['size'].to_string(index=False).strip()), 8)
-                    value = round(float(last_buy_order['value'].to_string(index=False).strip()), 8)
-                    price = round(float(last_buy_order['price'].to_string(index=False).strip()), 8)
-                    buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 8)
-
-                    buy_filled = round(value, 8)
-
                     api = CBPublicAPI()
                     ticker = api.getTicker(market)
-                    current_value = round(ticker * size, 8)
+                    current_price = ticker[1]
 
-                    maker_sale_fees = current_value * maker_fee_rate
-                    taker_sale_fees = current_value * taker_fee_rate
+                    market = last_buy_order['market'].to_string(index=False).strip()
+                    buy_type = last_buy_order['type'].to_string(index=False).strip()
+                    buy_size = round(float(last_buy_order['size'].to_string(index=False).strip()), 8)
+                    buy_filled = round(float(last_buy_order['filled'].to_string(index=False).strip()), 8)
+                    buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 8)
+                    buy_price = round(float(last_buy_order['price'].to_string(index=False).strip()), 8)
 
-                    maker_net_profit = round(current_value - buy_filled - maker_sale_fees, 2)
-                    maker_margin = ( maker_net_profit/ buy_filled) * 100
+                    sell_fees = ((buy_filled * current_price) * maker_fee_rate)
 
-                    taker_net_profit = round(current_value - buy_filled - taker_sale_fees, 2)
-                    taker_margin = (taker_net_profit / buy_filled) * 100
+                    current_size = buy_filled * current_price - ((buy_filled * current_price) * maker_fee_rate)
 
-                    if isinstance(ticker, float):
-                        print ("\n", "       Current Price :", ticker)
+                    maker_net_profit = round(current_size - buy_size, 2)
+                    maker_margin = (maker_net_profit/ buy_size) * 100
 
-                        print ("\n", "      Purchase Value :", "{:.2f}".format(value))
-                        print (     "        Current Value :", "{:.2f}".format(current_value))
+                    taker_net_profit = round(current_size - buy_size, 2)
+                    taker_margin = (taker_net_profit / buy_size) * 100
 
-                        print ("\n", "      Maker Sale Fee :", "{:.2f}".format(maker_sale_fees), '(', str(maker_fee_rate), ')')
-                        print (     "       Taker Sale Fee :", "{:.2f}".format(taker_sale_fees), '(', str(taker_fee_rate), ')')
+                    if isinstance(current_price, float):
+                        print ("\n", "       Current Price :", current_price)
+
+                        print ("\n", "      Purchase Value :", "{:.2f}".format(buy_size))
+                        print (     "        Current Value :", "{:.2f}".format(current_size))
+
+                        if buy_type == 'market':
+                            print ("\n", "             Buy Fee :", "{:.6f}".format(buy_fees), '(', str(maker_fee_rate), ')')
+                            print ("             Sell Fee :", "{:.6f}".format(sell_fees), '(', str(maker_fee_rate), ')')
+                        elif buy_type == 'limit':
+                            print ("\n", "             Buy Fee :", "{:.6f}".format(buy_fees), '(', str(taker_fee_rate), ')')
+                            print ("             Sell Fee :", "{:.6f}".format(sell_fees), '(', str(taker_fee_rate), ')')
 
                         print ("\n", "        Maker Profit :", "{:.2f}".format(maker_net_profit))
                         print (     "         Maker Margin :", str("{:.2f}".format(maker_margin)) + '%')
@@ -195,6 +194,8 @@ try:
                         last_buy_order = second_last_order[second_last_order.action == 'buy']
                         last_buy_order = last_buy_order.reset_index(drop=True)
 
+                        print ('Fixing this next!')
+
                         if len(last_buy_order) > 0:
                             orders = api.getOrders(status='open')
                             if len(orders) == 1:
@@ -203,47 +204,6 @@ try:
 
                                 print (last_buy_order.to_string(index=False))
                                 print ("\n", last_open_order.to_string(index=False))
-
-                                market = last_buy_order['market'].to_string(index=False).strip()
-                                order_type = last_buy_order['type'].to_string(index=False).strip()
-                                size = round(float(last_buy_order['size'].to_string(index=False).strip()), 6)
-                                value = round(float(last_buy_order['value'].to_string(index=False).strip()), 2)
-                                price = round(float(last_buy_order['price'].to_string(index=False).strip()), 2)
-                                buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 2)
-
-                                buy_filled = round(value + buy_fees, 2)
-
-                                future_value = round(float(last_open_order['value'].to_string(index=False).strip()), 2)
-
-                                api = CBPublicAPI()
-                                ticker = api.getTicker(market)
-                                current_value = round(ticker * size, 2)
-
-                                maker_sale_fees = future_value * maker_fee_rate
-                                taker_sale_fees = current_value * taker_fee_rate
-
-                                maker_net_profit = round(future_value - buy_filled - maker_sale_fees, 2)
-
-                                maker_margin = (maker_net_profit / buy_filled) * 100
-
-                                taker_net_profit = round(current_value - buy_filled - taker_sale_fees, 2)
-                                taker_margin = (taker_net_profit / buy_filled) * 100
-
-                                if isinstance(ticker, float):
-                                    print ("\n", "       Current Price :", "{:.2f}".format(ticker))
-
-                                    print ("\n", "      Purchase Value :", "{:.2f}".format(value))
-                                    print (     "        Current Value :", "{:.2f}".format(current_value))
-                                    print (     "         Target Value :", "{:.2f}".format(future_value))
-
-                                    print ("\n", "      Maker Sale Fee :", "{:.2f}".format(maker_sale_fees), '(', str(maker_fee_rate), ')')
-                                    print (     "       Taker Sale Fee :", "{:.2f}".format(taker_sale_fees), '(', str(taker_fee_rate), ')')
-
-                                    print (     "         Taker Profit :", "{:.2f}".format(taker_net_profit), '(now)')
-                                    print (     "         Taker Margin :", str("{:.2f}".format(taker_margin)) + '%', '(now)')
-
-                                    print (     "         Maker Profit :", "{:.2f}".format(maker_net_profit), '(target)')
-                                    print (     "         Maker Margin :", str("{:.2f}".format(maker_margin)) + '%', '(target)')
 
                             else:
                                 print ('*** no active position open ***')
@@ -261,6 +221,9 @@ try:
 
         #break
 
+    print ('CSV tracker temporarily disabled!')
+
+    """
     df_tracker = df_tracker[df_tracker['status'] == 'done']
     df_tracker['profit'] = df_tracker['sell_minus_fees'] - df_tracker['buy_with_fees']
     df_tracker['margin'] = (df_tracker['profit'] / df_tracker['buy_with_fees']) * 100
@@ -271,6 +234,7 @@ try:
         df_sincebot.to_csv(save_file, index=False)
     except OSError:
         raise SystemExit('Unable to save: ', save_file)
+    """
 
 except IOError as err:
     print (err)
