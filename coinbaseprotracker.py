@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+# encoding: utf-8
+
 import json, sys
 import numpy as np
 import pandas as pd
-from models.CoinbasePro import AuthAPI as CBAuthAPI, PublicAPI as CBPublicAPI
+from models.exchange.coinbase_pro import AuthAPI as CBAuthAPI, PublicAPI as CBPublicAPI
 
 def printHelp():
     print ('Create a config.json:')
@@ -100,43 +103,43 @@ try:
                     pair = 1
 
                 if pair == 1 and (row['action'] != last_action):
-                    if row['action'] == 'buy':                        
+                    if row['action'] == 'buy':
                         if row['type'] == 'limit':
                             row['value'] = (row['price'] * row['size']) - row['fees']
-                        
+
                         df_buy = row
                     elif row['action'] == 'sell':
                         df_sell = row
-                            
+
                 if row['action'] == 'sell' and len(df_buy) != 0:
                     df_pair = pd.DataFrame([
                         [
-                            df_sell['status'], 
-                            df_buy['market'], 
-                            df_buy['created_at'], 
-                            df_buy['type'], 
+                            df_sell['status'],
+                            df_buy['market'],
+                            df_buy['created_at'],
+                            df_buy['type'],
                             round(df_buy['size'], 5),
                             round(df_buy['value'], 2),
-                            round(df_buy['fees'], 2), 
+                            round(df_buy['fees'], 2),
                             round(df_buy['value'] + df_buy['fees'], 2),
                             round(df_buy['price'], 2),
                             df_sell['created_at'],
-                            df_sell['type'], 
+                            df_sell['type'],
                             round(df_sell['size'], 5),
                             round(df_sell['price'] * df_sell['size'], 2),
-                            round(df_sell['fees'], 2), 
+                            round(df_sell['fees'], 2),
                             round((df_sell['price'] * df_sell['size']) - df_buy['fees'], 2),
-                            round(df_sell['price'], 2)                    
-                        ]], columns=[ 'status', 'market', 
+                            round(df_sell['price'], 2)
+                        ]], columns=[ 'status', 'market',
                             'buy_at', 'buy_type', 'buy_size', 'buy_value', 'buy_fees', 'buy_with_fees','buy_price',
-                            'sell_at', 'sell_type', 'sell_size', 'sell_value', 'sell_fees', 'sell_minus_fees', 'sell_price' 
+                            'sell_at', 'sell_type', 'sell_size', 'sell_value', 'sell_fees', 'sell_minus_fees', 'sell_price'
                         ])
-                    
+
                     df_tracker = df_tracker.append(df_pair, ignore_index=True)
                     pair = 0
-                
+
                 last_action = row['action']
-            
+
             fees = api.authAPI('GET', 'fees')
             maker_fee_rate = float(fees['maker_fee_rate'].to_string(index=False).strip())
             taker_fee_rate = float(fees['taker_fee_rate'].to_string(index=False).strip())
@@ -155,7 +158,7 @@ try:
                     value = round(float(last_buy_order['value'].to_string(index=False).strip()), 8)
                     price = round(float(last_buy_order['price'].to_string(index=False).strip()), 8)
                     buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 8)
-                    
+
                     buy_filled = round(value, 8)
 
                     api = CBPublicAPI()
@@ -171,7 +174,7 @@ try:
                     taker_net_profit = round(current_value - buy_filled - taker_sale_fees, 2)
                     taker_margin = (taker_net_profit / buy_filled) * 100
 
-                    if isinstance(ticker, float): 
+                    if isinstance(ticker, float):
                         print ("\n", "       Current Price :", ticker)
 
                         print ("\n", "      Purchase Value :", "{:.2f}".format(value))
@@ -200,14 +203,14 @@ try:
 
                                 print (last_buy_order.to_string(index=False))
                                 print ("\n", last_open_order.to_string(index=False))
-                                
+
                                 market = last_buy_order['market'].to_string(index=False).strip()
                                 order_type = last_buy_order['type'].to_string(index=False).strip()
                                 size = round(float(last_buy_order['size'].to_string(index=False).strip()), 6)
                                 value = round(float(last_buy_order['value'].to_string(index=False).strip()), 2)
                                 price = round(float(last_buy_order['price'].to_string(index=False).strip()), 2)
                                 buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 2)
-                    
+
                                 buy_filled = round(value + buy_fees, 2)
 
                                 future_value = round(float(last_open_order['value'].to_string(index=False).strip()), 2)
@@ -226,7 +229,7 @@ try:
                                 taker_net_profit = round(current_value - buy_filled - taker_sale_fees, 2)
                                 taker_margin = (taker_net_profit / buy_filled) * 100
 
-                                if isinstance(ticker, float): 
+                                if isinstance(ticker, float):
                                     print ("\n", "       Current Price :", "{:.2f}".format(ticker))
 
                                     print ("\n", "      Purchase Value :", "{:.2f}".format(value))
@@ -250,7 +253,7 @@ try:
 
                     else:
                         print ('*** no active position open ***')
-            
+
             print ("\n")
         else:
             printHelp()
@@ -267,7 +270,7 @@ try:
     try:
         df_sincebot.to_csv(save_file, index=False)
     except OSError:
-        raise SystemExit('Unable to save: ', save_file) 
+        raise SystemExit('Unable to save: ', save_file)
 
 except IOError as err:
     print (err)
