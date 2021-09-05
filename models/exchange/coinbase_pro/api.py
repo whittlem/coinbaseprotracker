@@ -296,13 +296,14 @@ class AuthAPI(AuthAPIBase):
             # replace null NaN values with 0
             df.copy().fillna(0, inplace=True)
 
-            df_tmp = df.copy()
-            df_tmp["price"] = 0.0
-            df_tmp["filled_size"] = df_tmp["filled_size"].astype(float)
-            df_tmp["specified_funds"] = df_tmp["specified_funds"].astype(float)
-            df_tmp["executed_value"] = df_tmp["executed_value"].astype(float)
-            df_tmp["fill_fees"] = df_tmp["fill_fees"].astype(float)
-            df = df_tmp
+            if df["type"].values[0] == "market":
+                df_tmp = df.copy()
+                df_tmp["price"] = 0.0
+                df_tmp["filled_size"] = df_tmp["filled_size"].astype(float)
+                df_tmp["specified_funds"] = df_tmp["specified_funds"].astype(float)
+                df_tmp["executed_value"] = df_tmp["executed_value"].astype(float)
+                df_tmp["fill_fees"] = df_tmp["fill_fees"].astype(float)
+                df = df_tmp
 
             # calculates the price at the time of purchase
             if status != "open":
@@ -313,7 +314,6 @@ class AuthAPI(AuthAPIBase):
                     else 0,
                     axis=1,
                 )
-                # df.loc[df['filled_size'] > 0, 'price'] = (df['executed_value'] * 100) / (df['filled_size'] * 100)
 
             # rename the columns
             if status == "open":
@@ -410,7 +410,8 @@ class AuthAPI(AuthAPIBase):
             df = df.iloc[::-1].reset_index()
 
             # for sell orders size is filled
-            df["size"] = df["size"].fillna(df["filled"])
+            if df["type"].values[0] == "market":
+                df["size"] = df["size"].fillna(df["filled"])
 
             return df
 
@@ -807,7 +808,9 @@ class PublicAPI(AuthAPIBase):
                 epoch = int(resp["epoch"])
                 return datetime.fromtimestamp(epoch)
             else:
-                Logger.error('resp does not contain the epoch key for some reason!') # remove this later
+                Logger.error(
+                    "resp does not contain the epoch key for some reason!"
+                )  # remove this later
                 Logger.error(resp)
                 return None
         except Exception as e:
@@ -853,19 +856,19 @@ class PublicAPI(AuthAPIBase):
             return resp.json()
 
         except requests.ConnectionError as err:
-            Logger.error('requests.ConnectionError') # remove this later
+            Logger.error("requests.ConnectionError")  # remove this later
             return self.handle_api_error(err, "ConnectionError")
 
         except requests.exceptions.HTTPError as err:
-            Logger.error('requests.exceptions.HTTPError') # remove this later
+            Logger.error("requests.exceptions.HTTPError")  # remove this later
             return self.handle_api_error(err, "HTTPError")
 
         except requests.Timeout as err:
-            Logger.error('requests.Timeout') # remove this later
+            Logger.error("requests.Timeout")  # remove this later
             return self.handle_api_error(err, "Timeout")
 
         except json.decoder.JSONDecodeError as err:
-            Logger.error('json.decoder.JSONDecodeError') # remove this later
+            Logger.error("json.decoder.JSONDecodeError")  # remove this later
             return self.handle_api_error(err, "JSONDecodeError")
 
     def handle_api_error(self, err: str, reason: str) -> dict:

@@ -6,45 +6,49 @@ import numpy as np
 import pandas as pd
 from models.exchange.coinbase_pro import AuthAPI as CBAuthAPI, PublicAPI as CBPublicAPI
 
+
 def printHelp():
-    print ('Create a config.json:')
-    print ('* Add 1 or more portfolios', "\n")
+    print("Create a config.json:")
+    print("* Add 1 or more portfolios", "\n")
 
-    print ('{')
-    print ('    "<portfolio_name>" : {')
-    print ('        "api_key" : "<coinbase_pro_api_key>",')
-    print ('        "api_secret" : "<coinbase_pro_api_secret>",')
-    print ('        "api_pass" : "<coinbase_pro_api_passphrase>",')
-    print ('        "config" : {')
-    print ('            "base_currency" : "<base_symbol>",')
-    print ('            "quote_currency" : "<quote_symbol>"')
-    print ('        "}')
-    print ('    },')
-    print ('    "<portfolio_name>" : {')
-    print ('        "api_key" : "<coinbase_pro_api_key>",')
-    print ('        "api_secret" : "<coinbase_pro_api_secret>",')
-    print ('        "api_pass" : "<coinbase_pro_api_passphrase>",')
-    print ('        "config" : {')
-    print ('            "base_currency" : "<base_symbol>",')
-    print ('            "quote_currency" : "<quote_symbol>"')
-    print ('        "}')
-    print ('    }')
-    print ('}', "\n")
+    print("{")
+    print('    "<portfolio_name>" : {')
+    print('        "api_key" : "<coinbase_pro_api_key>",')
+    print('        "api_secret" : "<coinbase_pro_api_secret>",')
+    print('        "api_pass" : "<coinbase_pro_api_passphrase>",')
+    print('        "config" : {')
+    print('            "base_currency" : "<base_symbol>",')
+    print('            "quote_currency" : "<quote_symbol>"')
+    print('        "}')
+    print("    },")
+    print('    "<portfolio_name>" : {')
+    print('        "api_key" : "<coinbase_pro_api_key>",')
+    print('        "api_secret" : "<coinbase_pro_api_secret>",')
+    print('        "api_pass" : "<coinbase_pro_api_passphrase>",')
+    print('        "config" : {')
+    print('            "base_currency" : "<base_symbol>",')
+    print('            "quote_currency" : "<quote_symbol>"')
+    print('        "}')
+    print("    }")
+    print("}", "\n")
 
-    print ('<portfolio_name> - Coinbase Pro portfolio name E.g. "Default portfolio"')
-    print ('<coinbase_pro_api_key> - Coinbase Pro API key for the portfolio')
-    print ('<coinbase_pro_api_secret> - Coinbase Pro API secret for the portfolio')
-    print ('<coinbase_pro_api_passphrase> - Coinbase Pro API passphrase for the portfolio')
-    print ('<base_symbol> - Base currency E.g. BTC')
-    print ('<quote_symbol> - Base currency E.g. GBP')
-    print ("\n")
+    print('<portfolio_name> - Coinbase Pro portfolio name E.g. "Default portfolio"')
+    print("<coinbase_pro_api_key> - Coinbase Pro API key for the portfolio")
+    print("<coinbase_pro_api_secret> - Coinbase Pro API secret for the portfolio")
+    print(
+        "<coinbase_pro_api_passphrase> - Coinbase Pro API passphrase for the portfolio"
+    )
+    print("<base_symbol> - Base currency E.g. BTC")
+    print("<quote_symbol> - Base currency E.g. GBP")
+    print("\n")
+
 
 try:
-    with open('config.json') as config_file:
+    with open("config.json") as config_file:
         json_config = json.load(config_file)
 
     if not isinstance(json_config, dict):
-        raise TypeError('config.json is invalid.')
+        raise TypeError("config.json is invalid.")
 
     if len(list(json_config)) < 1:
         printHelp()
@@ -53,43 +57,54 @@ try:
     df_tracker = pd.DataFrame()
 
     for portfolio in list(json_config):
-        base_currency = ''
-        quote_currency = ''
-        market = ''
+        base_currency = ""
+        quote_currency = ""
+        market = ""
 
         portfolio_config = json_config[portfolio]
 
-        if 'api_key' in portfolio_config and 'api_secret' in portfolio_config and 'api_pass' in portfolio_config and 'config' in portfolio_config:
-            print ('=== ', portfolio, " =======================================================\n")
+        if (
+            "api_key" in portfolio_config
+            and "api_secret" in portfolio_config
+            and "api_pass" in portfolio_config
+            and "config" in portfolio_config
+        ):
+            print(
+                "=== ",
+                portfolio,
+                " =======================================================\n",
+            )
 
-            api_key = portfolio_config['api_key']
-            api_secret = portfolio_config['api_secret']
-            api_pass = portfolio_config['api_pass']
+            api_key = portfolio_config["api_key"]
+            api_secret = portfolio_config["api_secret"]
+            api_pass = portfolio_config["api_pass"]
 
-            config = portfolio_config['config']
-            if ('cryptoMarket' not in config and 'base_currency' not in config) and ('fiatMarket' not in config and 'quote_currency' not in config):
+            config = portfolio_config["config"]
+            if ("cryptoMarket" not in config and "base_currency" not in config) and (
+                "fiatMarket" not in config and "quote_currency" not in config
+            ):
                 printHelp()
                 sys.exit()
 
-            if 'cryptoMarket' in config:
-                base_currency = config['cryptoMarket']
-            elif 'base_currency' in config:
-                base_currency = config['base_currency']
+            if "cryptoMarket" in config:
+                base_currency = config["cryptoMarket"]
+            elif "base_currency" in config:
+                base_currency = config["base_currency"]
 
-            if 'fiatMarket' in config:
-                quote_currency = config['fiatMarket']
-            elif 'base_currency' in config:
-                quote_currency = config['quote_currency']
+            if "fiatMarket" in config:
+                quote_currency = config["fiatMarket"]
+            elif "base_currency" in config:
+                quote_currency = config["quote_currency"]
 
-            market = base_currency + '-' + quote_currency
+            market = base_currency + "-" + quote_currency
 
             api = CBAuthAPI(api_key, api_secret, api_pass)
             orders = api.getOrders(market)
 
-            last_action = ''
+            last_action = ""
             if len(orders) > 0:
-                for market in orders['market'].sort_values().unique():
-                    df_market = orders[orders['market'] == market]
+                for market in orders["market"].sort_values().unique():
+                    df_market = orders[orders["market"] == market]
             else:
                 df_market = pd.DataFrame()
 
@@ -99,134 +114,307 @@ try:
             pair = 0
             # pylint: disable=unused-variable
             for index, row in df_market.iterrows():
-                if row['action'] == 'buy':
+                if row["action"] == "buy":
                     pair = 1
 
-                if pair == 1 and (row['action'] != last_action):
-                    if row['action'] == 'buy':
+                if pair == 1 and (row["action"] != last_action):
+                    if row["action"] == "buy":
                         df_buy = row
-                    elif row['action'] == 'sell':
+                    elif row["action"] == "sell":
                         df_sell = row
 
-                if row['action'] == 'sell' and len(df_buy) != 0:
-                    df_pair = pd.DataFrame([
+                if row["action"] == "sell" and len(df_buy) != 0:
+                    df_pair = pd.DataFrame(
                         [
-                            df_sell['status'],
-                            df_buy['market'],
-                            df_buy['created_at'],
-                            df_buy['type'],
-                            df_buy['size'],
-                            df_buy['filled'],
-                            df_buy['fees'],
-                            df_buy['price'],
-
-                            df_sell['created_at'],
-                            df_sell['type'],
-                            df_sell['size'],
-                            df_sell['filled'],
-                            df_sell['fees'],
-                            df_sell['price'],
-                        ]], columns=[ 'status', 'market',
-                            'buy_at', 'buy_type', 'buy_size', 'buy_filled', 'buy_fees', 'buy_price',
-                            'sell_at', 'sell_type', 'sell_size', 'sell_filled', 'sell_fees', 'sell_price'
-                        ])
+                            [
+                                df_sell["status"],
+                                df_buy["market"],
+                                df_buy["created_at"],
+                                df_buy["type"],
+                                df_buy["size"],
+                                df_buy["filled"],
+                                df_buy["fees"],
+                                df_buy["price"],
+                                df_sell["created_at"],
+                                df_sell["type"],
+                                df_sell["size"],
+                                df_sell["filled"],
+                                df_sell["fees"],
+                                df_sell["price"],
+                            ]
+                        ],
+                        columns=[
+                            "status",
+                            "market",
+                            "buy_at",
+                            "buy_type",
+                            "buy_size",
+                            "buy_filled",
+                            "buy_fees",
+                            "buy_price",
+                            "sell_at",
+                            "sell_type",
+                            "sell_size",
+                            "sell_filled",
+                            "sell_fees",
+                            "sell_price",
+                        ],
+                    )
 
                     df_tracker = df_tracker.append(df_pair, ignore_index=True)
                     pair = 0
 
-                last_action = row['action']
+                last_action = row["action"]
 
-            fees = api.authAPI('GET', 'fees')
-            maker_fee_rate = float(fees['maker_fee_rate'].to_string(index=False).strip())
-            taker_fee_rate = float(fees['taker_fee_rate'].to_string(index=False).strip())
+            fees = api.authAPI("GET", "fees")
+            maker_fee_rate = float(
+                fees["maker_fee_rate"].to_string(index=False).strip()
+            )
+            taker_fee_rate = float(
+                fees["taker_fee_rate"].to_string(index=False).strip()
+            )
 
             if len(orders) > 0:
                 last_order = orders.iloc[-1:]
-                last_buy_order = last_order[last_order.action == 'buy']
+                last_buy_order = last_order[last_order.action == "buy"]
                 last_buy_order = last_buy_order.reset_index(drop=True)
 
                 if len(last_buy_order) > 0:
-                    print (last_buy_order.to_string(index=False))
+                    print(last_buy_order.to_string(index=False))
 
                     api = CBPublicAPI()
                     ticker = api.getTicker(market)
                     current_price = ticker[1]
 
-                    market = last_buy_order['market'].to_string(index=False).strip()
-                    buy_type = last_buy_order['type'].to_string(index=False).strip()
-                    buy_size = round(float(last_buy_order['size'].to_string(index=False).strip()), 8)
-                    buy_filled = round(float(last_buy_order['filled'].to_string(index=False).strip()), 8)
-                    buy_fees = round(float(last_buy_order['fees'].to_string(index=False).strip()), 8)
-                    buy_price = round(float(last_buy_order['price'].to_string(index=False).strip()), 8)
+                    market = last_buy_order["market"].to_string(index=False).strip()
+                    buy_type = last_buy_order["type"].to_string(index=False).strip()
+                    buy_size = round(
+                        float(last_buy_order["size"].to_string(index=False).strip()), 8
+                    )
+                    buy_filled = round(
+                        float(last_buy_order["filled"].to_string(index=False).strip()),
+                        8,
+                    )
+                    buy_fees = round(
+                        float(last_buy_order["fees"].to_string(index=False).strip()), 8
+                    )
+                    buy_price = round(
+                        float(last_buy_order["price"].to_string(index=False).strip()), 8
+                    )
 
-                    sell_fees = ((buy_filled * current_price) * maker_fee_rate)
+                    sell_fees = (buy_filled * current_price) * maker_fee_rate
 
-                    current_size = buy_filled * current_price - ((buy_filled * current_price) * maker_fee_rate)
+                    current_size = buy_filled * current_price - (
+                        (buy_filled * current_price) * maker_fee_rate
+                    )
 
                     maker_net_profit = round(current_size - buy_size, 2)
-                    maker_margin = (maker_net_profit/ buy_size) * 100
+                    maker_margin = (maker_net_profit / buy_size) * 100
 
                     taker_net_profit = round(current_size - buy_size, 2)
                     taker_margin = (taker_net_profit / buy_size) * 100
 
                     if isinstance(current_price, float):
-                        print ("\n", "       Current Price :", current_price)
+                        print("\n", "       Current Price :", current_price)
 
-                        print ("\n", "      Purchase Value :", "{:.2f}".format(buy_size))
-                        print (     "        Current Value :", "{:.2f}".format(current_size))
+                        print("\n", "      Purchase Value :", "{:.2f}".format(buy_size))
+                        print("        Current Value :", "{:.2f}".format(current_size))
 
-                        if buy_type == 'market':
-                            print ("\n", "             Buy Fee :", "{:.6f}".format(buy_fees), '(', str(maker_fee_rate), ')')
-                            print ("             Sell Fee :", "{:.6f}".format(sell_fees), '(', str(maker_fee_rate), ')')
-                        elif buy_type == 'limit':
-                            print ("\n", "             Buy Fee :", "{:.6f}".format(buy_fees), '(', str(taker_fee_rate), ')')
-                            print ("             Sell Fee :", "{:.6f}".format(sell_fees), '(', str(taker_fee_rate), ')')
+                        if buy_type == "market":
+                            print(
+                                "\n",
+                                "             Buy Fee :",
+                                "{:.6f}".format(buy_fees),
+                                "(",
+                                str(maker_fee_rate),
+                                ")",
+                            )
+                            print(
+                                "             Sell Fee :",
+                                "{:.6f}".format(sell_fees),
+                                "(",
+                                str(maker_fee_rate),
+                                ")",
+                            )
+                        elif buy_type == "limit":
+                            print(
+                                "\n",
+                                "             Buy Fee :",
+                                "{:.6f}".format(buy_fees),
+                                "(",
+                                str(taker_fee_rate),
+                                ")",
+                            )
+                            print(
+                                "             Sell Fee :",
+                                "{:.6f}".format(sell_fees),
+                                "(",
+                                str(taker_fee_rate),
+                                ")",
+                            )
 
-                        print ("\n", "        Maker Profit :", "{:.2f}".format(maker_net_profit))
-                        print (     "         Maker Margin :", str("{:.2f}".format(maker_margin)) + '%')
+                        print(
+                            "\n",
+                            "        Maker Profit :",
+                            "{:.2f}".format(maker_net_profit),
+                        )
+                        print(
+                            "         Maker Margin :",
+                            str("{:.2f}".format(maker_margin)) + "%",
+                        )
 
-                        print ("\n", "        Taker Profit :", "{:.2f}".format(taker_net_profit))
-                        print (     "         Taker Margin :", str("{:.2f}".format(taker_margin)) + '%')
+                        print(
+                            "\n",
+                            "        Taker Profit :",
+                            "{:.2f}".format(taker_net_profit),
+                        )
+                        print(
+                            "         Taker Margin :",
+                            str("{:.2f}".format(taker_margin)) + "%",
+                        )
 
                 else:
                     if len(orders) > 0:
-                        second_last_order = orders.iloc[-2:]
-                        last_buy_order = second_last_order[second_last_order.action == 'buy']
+                        second_last_order = orders.iloc[-2:-1]
+                        last_buy_order = second_last_order[
+                            second_last_order.action == "buy"
+                        ]
                         last_buy_order = last_buy_order.reset_index(drop=True)
 
-                        print ('Fixing this next!')
-
                         if len(last_buy_order) > 0:
-                            orders = api.getOrders(status='open')
+                            orders = api.getOrders(status="open")
                             if len(orders) == 1:
-                                last_open_order = orders[orders.action == 'sell']
+                                last_open_order = orders[orders.action == "sell"]
                                 last_open_order = last_open_order.reset_index(drop=True)
 
-                                print (last_buy_order.to_string(index=False))
-                                print ("\n", last_open_order.to_string(index=False))
+                                print(last_buy_order.to_string(index=False))
+                                print("\n", last_open_order.to_string(index=False))
+
+                                api = CBPublicAPI()
+                                ticker = api.getTicker(market)
+                                current_price = ticker[1]
+                                future_price = float(last_open_order["price"].values[0])
+
+                                market = last_buy_order["market"].to_string(index=False).strip()
+                                buy_type = last_buy_order["type"].to_string(index=False).strip()
+                                buy_size = round(
+                                    float(last_buy_order["size"].to_string(index=False).strip()), 8
+                                )
+                                buy_filled = round(
+                                    float(last_buy_order["filled"].to_string(index=False).strip()),
+                                    8,
+                                )
+                                buy_fees = round(
+                                    float(last_buy_order["fees"].to_string(index=False).strip()), 8
+                                )
+                                buy_price = round(
+                                    float(last_buy_order["price"].to_string(index=False).strip()), 8
+                                )
+
+                                sell_fees = (buy_filled * current_price) * maker_fee_rate
+
+                                current_size = buy_filled * current_price - (
+                                    (buy_filled * current_price) * maker_fee_rate
+                                )
+
+                                taker_net_profit = round(current_size - buy_size, 2)
+                                taker_margin = (taker_net_profit / buy_size) * 100
+
+                                sell_size = round(
+                                    float(last_open_order["value"].to_string(index=False).strip()), 8
+                                )
+
+                                sell_filled = round(
+                                    float(last_open_order["size"].to_string(index=False).strip()),
+                                    8,
+                                )
+
+                                future_size = sell_filled * future_price - (
+                                    (sell_filled * future_price) * maker_fee_rate
+                                )
+
+                                maker_net_profit = round(sell_size - buy_filled, 2)
+                                maker_margin = (maker_net_profit / sell_size) * 100
+
+                                if isinstance(current_price, float):
+                                    print("\n", "       Current Price :", current_price)
+
+                                    print("\n", "      Purchase Value :", "{:.2f}".format(buy_size))
+                                    print("        Current Value :", "{:.2f}".format(current_size))
+                                    print("         Target Value :", "{:.2f}".format(sell_size))
+
+                                    if buy_type == "market":
+                                        print(
+                                            "\n",
+                                            "             Buy Fee :",
+                                            "{:.6f}".format(buy_fees),
+                                            "(",
+                                            str(maker_fee_rate),
+                                            ")",
+                                        )
+                                        print(
+                                            "             Sell Fee :",
+                                            "{:.6f}".format(sell_fees),
+                                            "(",
+                                            str(maker_fee_rate),
+                                            ")",
+                                        )
+                                    elif buy_type == "limit":
+                                        print(
+                                            "\n",
+                                            "             Buy Fee :",
+                                            "{:.6f}".format(buy_fees),
+                                            "(",
+                                            str(taker_fee_rate),
+                                            ")",
+                                        )
+                                        print(
+                                            "             Sell Fee :",
+                                            "{:.6f}".format(sell_fees),
+                                            "(",
+                                            str(taker_fee_rate),
+                                            ")",
+                                        )
+
+                                    print(
+                                        "\n",
+                                        "        Taker Profit :",
+                                        "{:.2f}".format(taker_net_profit), "(now)"
+                                    )
+                                    print(
+                                        "         Taker Margin :",
+                                        str("{:.2f}".format(taker_margin)) + "% (now)",
+                                    )
+
+                                    print(
+                                        "\n",
+                                        "        Maker Profit :",
+                                        "{:.2f}".format(maker_net_profit), "(target)"
+                                    )
+                                    print(
+                                        "         Maker Margin :",
+                                        str("{:.2f}".format(maker_margin)) + "% (target)",
+                                    )
 
                             else:
-                                print ('*** no active position open ***')
+                                print("*** no active position open ***")
 
                         else:
-                            print ('*** no active position open ***')
+                            print("*** no active position open ***")
 
                     else:
-                        print ('*** no active position open ***')
+                        print("*** no active position open ***")
 
-            print ("\n")
+            print("\n")
         else:
             printHelp()
             sys.exit()
 
         #break
 
-    print ('CSV tracker temporarily disabled!')
-
-    """
     df_tracker = df_tracker[df_tracker['status'] == 'done']
-    df_tracker['profit'] = df_tracker['sell_minus_fees'] - df_tracker['buy_with_fees']
-    df_tracker['margin'] = (df_tracker['profit'] / df_tracker['buy_with_fees']) * 100
+    df_tracker['profit'] = df_tracker['sell_filled'] - df_tracker['buy_size']
+    df_tracker['margin'] = (df_tracker['profit'] / df_tracker['buy_size']) * 100
     df_sincebot = df_tracker[df_tracker['buy_at'] > '2021-02-1']
     save_file = 'tracker.csv'
 
@@ -234,9 +422,8 @@ try:
         df_sincebot.to_csv(save_file, index=False)
     except OSError:
         raise SystemExit('Unable to save: ', save_file)
-    """
 
 except IOError as err:
-    print (err)
+    print(err)
 except Exception as err:
-    print (err)
+    print(err)
