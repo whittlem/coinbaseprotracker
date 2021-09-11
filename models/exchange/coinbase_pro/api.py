@@ -586,6 +586,33 @@ class AuthAPI(AuthAPIBase):
 
         return floor(amount * 10 ** nb_digits) / 10 ** nb_digits
 
+    def getTransfers(self, ttype=''):
+        """Retrieves your list of transfers with optional filtering"""
+
+        # validates transfer type
+        if ttype not in [ '', 'withdraw', 'interval_withdraw', 'deposit' ]:
+            raise ValueError('Invalid transfer type.')
+
+        # GET /transfers
+        resp = self.authAPI('GET', 'transfers?type=' + ttype)
+        if len(resp) > 0:
+            df = resp.copy()[[ 'completed_at', 'type', 'amount' ]]
+
+            df['market'] = None
+            df['type2'] = None
+            df['size'] = None
+            df['fees'] = None
+            df['price'] = None
+            df['status'] = 'done'
+
+            df = df[[ 'completed_at', 'market', 'type', 'type2', 'size', 'amount', 'fees', 'price', 'status' ]]
+            df.columns = [ 'created_at', 'market', 'action', 'type', 'size', 'value', 'fees', 'price', 'status' ]
+            df = df.dropna(subset=['created_at'])
+
+            return df
+        else:
+            return pd.DataFrame()
+
     def authAPI(self, method: str, uri: str, payload: str = "") -> pd.DataFrame:
         """Initiates a REST API call"""
 

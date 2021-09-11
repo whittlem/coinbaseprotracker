@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+# encoding: utf-8
+
 import re, json, sys
 import numpy as np
 import pandas as pd
-from models.CoinbasePro import AuthAPI as CBAuthAPI, PublicAPI as CBPublicAPI
+from models.exchange.coinbase_pro import AuthAPI as CBAuthAPI, PublicAPI as CBPublicAPI
 
 def printHelp():
     print ('Create a config.json:')
@@ -79,7 +82,7 @@ try:
             market = base_currency + '-' + quote_currency
 
             api = CBAuthAPI(api_key, api_secret, api_pass)
-            
+
             orders = api.getOrders()
             df = pd.concat([df, orders])
 
@@ -94,7 +97,7 @@ try:
     try:
         df.to_csv(save_file, index=False)
     except OSError:
-        raise SystemExit('Unable to save: ', save_file) 
+        raise SystemExit('Unable to save: ', save_file)
 
 except IOError as err:
     print (err)
