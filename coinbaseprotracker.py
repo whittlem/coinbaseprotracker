@@ -98,8 +98,8 @@ try:
             api_key = portfolio_config["api_key"]
             api_secret = portfolio_config["api_secret"]
 
-            if "api_passphrase" in portfolio_config:
-                api_pass = portfolio_config["api_passphrase"]
+            if "api_pass" in portfolio_config:
+                api_pass = portfolio_config["api_pass"]
             elif "api_passphrase" in portfolio_config:
                 api_pass = portfolio_config["api_passphrase"]
 
