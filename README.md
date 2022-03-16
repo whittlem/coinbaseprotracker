@@ -31,55 +31,110 @@ python3 -m pip install -r requirements.txt
 
 ## Configuration
 
-Create a config.json file with your read-only Coinbase Pro portfolio API keys:
+    Create a config.json:
+
+    * Add 1 or more portfolios with a single market
 
     {
-        "Bot - XLM-EUR" : {
-            "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
-            "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
+        "<portfolio_name>" : {
+            "api_key" : "<coinbase_pro_api_key>",
+            "api_secret" : "<coinbase_pro_api_secret>",
+            "api_passphrase" : "<coinbase_pro_api_passphrase>",
             "config" : {
-                "base_currency" : "XLM",
-                "quote_currency" : "EUR"
-            }
+                "base_currency" : "<base_symbol>",
+                "quote_currency" : "<quote_symbol>"
+            "}
         },
-        "Bot - ETH-GBP" : {
-            "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
-            "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
+        "<portfolio_name>" : {
+            "api_key" : "<coinbase_pro_api_key>",
+            "api_secret" : "<coinbase_pro_api_secret>",
+            "api_passphrase" : "<coinbase_pro_api_passphrase>",
             "config" : {
-                "base_currency" : "ETH",
-                "quote_currency" : "GBP"
-            }
-        },
-        "Bot - BTC-GBP" : {
-            "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
-            "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
-             "config" : {
-                "base_currency" : "BTC",
-                "quote_currency" : "GBP"
-            }
-        },
-        "Bot - BCH-GBP" : {
-            "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
-            "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
-             "config" : {
-                "base_currency" : "BCH",
-                "quote_currency" : "GBP"
-            }
-        },
-        "Bot - LTC-GBP" : {
-            "api_key" : "YOUR_PORTFOLIO_COINBASE_PRO_API_KEY",
-            "api_secret" : "YOUR_PORTFOLIO_COINBASE_PRO_API_SECRET",
-            "api_pass" : "YOUR_PORTFOLIO_COINBASE_PRO_API_PASSPHRASE",
-             "config" : {
-                "base_currency" : "LTC",
-                "quote_currency" : "GBP"
-            }
+                "base_currency" : "<base_symbol>",
+                "quote_currency" : "<quote_symbol>"
+            "}
         }
     }
+
+    * Add 1 or more portfolios with multiple markets
+
+    {
+        "<portfolio_name>" : {
+            "api_key" : "<coinbase_pro_api_key>",
+            "api_secret" : "<coinbase_pro_api_secret>",
+            "api_passphrase" : "<coinbase_pro_api_passphrase>",
+            "config" : [{
+                "base_currency" : "<base_symbol>",
+                "quote_currency" : "<quote_symbol>"
+            "}],[{
+                "base_currency" : "<base_symbol>",
+                "quote_currency" : "<quote_symbol>"
+            "}]
+        }
+    }
+
+    * Notice that to add multiple markets you convert the 'config' from a dictionary to a list.
+
+    <portfolio_name> - Coinbase Pro portfolio name E.g. "Default Portfolio"
+    <coinbase_pro_api_key> - Coinbase Pro API key for the portfolio
+    <coinbase_pro_api_secret> - Coinbase Pro API secret for the portfolio
+    <coinbase_pro_api_passphrase> - Coinbase Pro API passphrase for the portfolio
+    <base_symbol> - Base currency E.g. BTC
+    <quote_symbol> - Base currency E.g. GBP
+
+
+    whittlem@Michaels-iMac-2 coinbaseprotracker % /usr/local/opt/python@3.9/bin/python3 /Users/whittlem/Documents/Repos/Python/coinbaseprotracker/coinbaseprotracker.py
+    Create a config.json:
+
+    * Add 1 or more portfolios with a single market
+
+    {
+        "<portfolio_name>" : {
+            "api_key" : "<coinbase_pro_api_key>",
+            "api_secret" : "<coinbase_pro_api_secret>",
+            "api_passphrase" : "<coinbase_pro_api_passphrase>",
+            "config" : {
+                "base_currency" : "<base_symbol>",
+                "quote_currency" : "<quote_symbol>"
+            "}
+        },
+        "<portfolio_name>" : {
+            "api_key" : "<coinbase_pro_api_key>",
+            "api_secret" : "<coinbase_pro_api_secret>",
+            "api_passphrase" : "<coinbase_pro_api_passphrase>",
+            "config" : {
+                "base_currency" : "<base_symbol>",
+                "quote_currency" : "<quote_symbol>"
+            "}
+        }
+    }
+
+    * Add 1 or more portfolios with multiple markets
+
+    {
+        "<portfolio_name>" : {
+            "api_key" : "<coinbase_pro_api_key>",
+            "api_secret" : "<coinbase_pro_api_secret>",
+            "api_passphrase" : "<coinbase_pro_api_passphrase>",
+            "config" : [{
+                "base_currency" : "<base_symbol>",
+                "quote_currency" : "<quote_symbol>"
+            "}],[{
+                "base_currency" : "<base_symbol>",
+                "quote_currency" : "<quote_symbol>"
+            "}]
+        }
+    }
+
+    * Notice that to add multiple markets you convert the 'config' from a dictionary to a list.
+
+    <portfolio_name> - Coinbase Pro portfolio name E.g. "Default Portfolio"
+    <coinbase_pro_api_key> - Coinbase Pro API key for the portfolio
+    <coinbase_pro_api_secret> - Coinbase Pro API secret for the portfolio
+    <coinbase_pro_api_passphrase> - Coinbase Pro API passphrase for the portfolio
+
+    <base_symbol> - Base currency E.g. BTC
+    <quote_symbol> - Base currency E.g. GBP
 
 ## Run it
 
