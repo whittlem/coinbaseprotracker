@@ -3,9 +3,11 @@
 
 import sys
 import json
+import warnings
 import pandas as pd
 from models.exchange.coinbase_pro import AuthAPI as CBAuthAPI, PublicAPI as CBPublicAPI
 
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 def printHelp():
     print("Create a config.json:\n")
