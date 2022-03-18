@@ -224,6 +224,7 @@ try:
                     last_action = row["action"]
 
                 fees = api.authAPI("GET", "fees")
+
                 maker_fee_rate = float(
                     fees["maker_fee_rate"].to_string(index=False).strip()
                 )
@@ -259,17 +260,14 @@ try:
                             float(last_buy_order["price"].to_string(index=False).strip()), 8
                         )
 
-                        sell_fees = (buy_filled * current_price) * maker_fee_rate
+                        sell_fees = (buy_filled * current_price) * taker_fee_rate
 
                         current_size = buy_filled * current_price - (
-                            (buy_filled * current_price) * maker_fee_rate
+                            (buy_filled * current_price) * taker_fee_rate
                         )
 
-                        maker_net_profit = round(current_size - buy_size, 2)
-                        maker_margin = (maker_net_profit / buy_size) * 100
-
-                        taker_net_profit = round(current_size - buy_size, 2)
-                        taker_margin = (taker_net_profit / buy_size) * 100
+                        net_profit = round(current_size - buy_size, 2)
+                        margin = (net_profit / buy_size) * 100
 
                         if isinstance(current_price, float):
                             print("\n", "       Current Price :", current_price)
@@ -283,14 +281,14 @@ try:
                                     "             Buy Fee :",
                                     "{:.6f}".format(buy_fees),
                                     "(",
-                                    str(maker_fee_rate),
+                                    str(taker_fee_rate),
                                     ")",
                                 )
                                 print(
                                     "             Sell Fee :",
                                     "{:.6f}".format(sell_fees),
                                     "(",
-                                    str(maker_fee_rate),
+                                    str(taker_fee_rate),
                                     ")",
                                 )
                             elif buy_type == "limit":
@@ -299,38 +297,28 @@ try:
                                     "             Buy Fee :",
                                     "{:.6f}".format(buy_fees),
                                     "(",
-                                    str(taker_fee_rate),
+                                    str(maker_fee_rate),
                                     ")",
                                 )
                                 print(
                                     "             Sell Fee :",
                                     "{:.6f}".format(sell_fees),
                                     "(",
-                                    str(taker_fee_rate),
+                                    str(maker_fee_rate),
                                     ")",
                                 )
 
                             print(
                                 "\n",
-                                "        Maker Profit :",
-                                "{:.2f}".format(maker_net_profit),
+                                "              Profit :",
+                                "{:.2f}".format(net_profit),
                             )
+                            total_profit += net_profit
                             print(
-                                "         Maker Margin :",
-                                str("{:.2f}".format(maker_margin)) + "%",
+                                "               Margin :",
+                                str("{:.2f}".format(margin)) + "%",
                             )
-
-                            print(
-                                "\n",
-                                "        Taker Profit :",
-                                "{:.2f}".format(taker_net_profit),
-                            )
-                            total_profit += taker_net_profit
-                            print(
-                                "         Taker Margin :",
-                                str("{:.2f}".format(taker_margin)) + "%",
-                            )
-                            total_margin += taker_margin
+                            total_margin += margin
 
                     else:
                         if len(orders) > 0:
@@ -399,14 +387,14 @@ try:
 
                                     sell_fees = (
                                         buy_filled * current_price
-                                    ) * maker_fee_rate
+                                    ) * taker_fee_rate
 
                                     current_size = buy_filled * current_price - (
-                                        (buy_filled * current_price) * maker_fee_rate
+                                        (buy_filled * current_price) * taker_fee_rate
                                     )
 
-                                    taker_net_profit = round(current_size - buy_size, 2)
-                                    taker_margin = (taker_net_profit / buy_size) * 100
+                                    net_profit = round(current_size - buy_size, 2)
+                                    margin = (net_profit / buy_size) * 100
 
                                     sell_size = round(
                                         float(
@@ -427,7 +415,7 @@ try:
                                     )
 
                                     future_size = sell_filled * future_price - (
-                                        (sell_filled * future_price) * maker_fee_rate
+                                        (sell_filled * future_price) * taker_fee_rate
                                     )
 
                                     maker_net_profit = round(sell_size - buy_filled, 2)
@@ -456,14 +444,14 @@ try:
                                                 "             Buy Fee :",
                                                 "{:.6f}".format(buy_fees),
                                                 "(",
-                                                str(maker_fee_rate),
+                                                str(taker_fee_rate),
                                                 ")",
                                             )
                                             print(
                                                 "             Sell Fee :",
                                                 "{:.6f}".format(sell_fees),
                                                 "(",
-                                                str(maker_fee_rate),
+                                                str(taker_fee_rate),
                                                 ")",
                                             )
                                         elif buy_type == "limit":
@@ -472,41 +460,29 @@ try:
                                                 "             Buy Fee :",
                                                 "{:.6f}".format(buy_fees),
                                                 "(",
-                                                str(taker_fee_rate),
+                                                str(maker_fee_rate),
                                                 ")",
                                             )
                                             print(
                                                 "             Sell Fee :",
                                                 "{:.6f}".format(sell_fees),
                                                 "(",
-                                                str(taker_fee_rate),
+                                                str(maker_fee_rate),
                                                 ")",
                                             )
 
                                         print(
                                             "\n",
-                                            "        Taker Profit :",
-                                            "{:.2f}".format(taker_net_profit),
+                                            "              Profit :",
+                                            "{:.2f}".format(net_profit),
                                             "(now)",
                                         )
-                                        total_profit += taker_net_profit
+                                        total_profit += net_profit
                                         print(
-                                            "         Taker Margin :",
-                                            str("{:.2f}".format(taker_margin)) + "% (now)",
+                                            "               Margin :",
+                                            str("{:.2f}".format(margin)) + "% (now)",
                                         )
-                                        total_margin += taker_margin
-
-                                        print(
-                                            "\n",
-                                            "        Maker Profit :",
-                                            "{:.2f}".format(maker_net_profit),
-                                            "(target)",
-                                        )
-                                        print(
-                                            "         Maker Margin :",
-                                            str("{:.2f}".format(maker_margin))
-                                            + "% (target)",
-                                        )
+                                        total_margin += margin
 
                                 else:
                                     print("*** no active position open ***")
